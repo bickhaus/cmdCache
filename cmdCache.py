@@ -54,9 +54,8 @@ args = parser.parse_args()
 def create_cmd_obj(file_loc, msg):
 	'''
 	Input: file containing stored commands, message to print if file not found
-	Return: If populated file storing commands found returns favoriteCommands object which stores
-	the highest numbered command (starting at 0), a dictionary with the format cmd_dict[number] = command, 
-	and the location of the command file;
+	Return: If a populated file is found at file_loc, returns commandCache object, 
+	otherwise exits program
 	'''
 	try: 
 		cmd_dict = {}

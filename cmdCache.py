@@ -22,15 +22,15 @@ import argparse
 import subprocess
 from pathlib import Path
 from sys import exit
-from shlex import quote
+
 
 ###############
 ## CONSTANTS ##
 ###############
 
 CMD_FILE_LOC = '/home/{0}/.cmdCache'.format(os.getlogin())
-EMPTY_FILE_MSG = ("\nYou have not yet stored any favorite commands."
-				 + "  Add your favorite commands to: \n\n\t{0}\n\n".format(CMD_FILE_LOC)
+EMPTY_FILE_MSG = ("\nYou have not yet stored any commands."
+				 + "  Commands should be stored here: \n\n\t{0}\n\n".format(CMD_FILE_LOC)
 				 + "Each command should be on its own line with no other text or formatting.")
 
 
@@ -94,15 +94,14 @@ class commandCache():
 
 	def valid_cmd(self, command):
 		''' Input: command number
-			Return: True if given a valid command number
-			Checks to see whether a proper command number was given
+			Return: True if given a valid command number, exits otherwise
 		'''
 		try:
 			command = int(command)
 			if command < 0 or command > self.highest_cmd:
 				raise ValueError
 		except (TypeError, ValueError):
-			print("You must enter the number of a valid command (0-{0})".format(self.highest_cmd))
+			print("You must enter the number of a valid command (0-{0})\n".format(self.highest_cmd))
 			exit()
 
 		return True
@@ -138,8 +137,7 @@ class commandCache():
 				
 	def runCommand(self, to_run):
 		''' Input: number of command to run 
-			Return: None
-			Runs the specified command and prints STDOUT to terminal
+			Return: stdout of command run as text
 		'''
 
 		if self.valid_cmd(to_run):
@@ -149,7 +147,7 @@ class commandCache():
 
 		print('Running command {0}: {1}...\n'.format(to_run, cmd))
 		out = subprocess.run(cmd, shell=True, check=True, capture_output=True, text=True)
-		print(out.stdout)
+		return out.stdout
 	
 	def __str__(self):
 		'''Return: formatted string representation of commands in CMD_FILE_LOC: Command#    Command
@@ -157,7 +155,7 @@ class commandCache():
 		cmd_list_str = "\n\nCommand#\tCommand\n-------------------------------\n"
 		
 		for key, value in sorted(self.cmd_dict.items()):
-			cmd_list_str += str(key) + "\t\t" + value + "\n"
+			cmd_list_str += str(key) + "\t" + value + "\n"
 			
 		return cmd_list_str + "\n"
 
@@ -176,4 +174,4 @@ elif args.remove:
 elif args.command is None:
 	print(cmd_cache)
 else:
-	cmd_cache.runCommand(args.command)
+	print(cmd_cache.runCommand(args.command))

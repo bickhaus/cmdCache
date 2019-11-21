@@ -52,10 +52,9 @@ args = parser.parse_args()
 ########################
 
 def create_cmd_obj(file_loc, msg):
-	'''
-	Input: file containing stored commands, message to print if file not found
-	Return: If a populated file is found at file_loc, returns commandCache object, 
-	otherwise exits program
+	'''	Input: file containing stored commands, message to print if file not found
+		Return: If a populated file is found at file_loc, returns commandCache object, 
+		otherwise exits program
 	'''
 	try: 
 		cmd_dict = {}
@@ -108,24 +107,22 @@ class commandCache():
 
 	def appendCommand(self, to_append):
 		''' Input: command (string) to append to file
-			Return: None
+			Return: string giving accounting of action taken
 			Appends given string to CMD_FILE_LOC
 		'''
-		print("Appending command {0}: {1}".format((self.highest_cmd + 1), to_append))
-
 		with open(self.file_loc, 'a') as f:
-			f.write(to_append + "\n")		
+			f.write(to_append + "\n")	
+
+		return "Command {0}: {1}, has been appended.".format((self.highest_cmd + 1), to_append)	
 
 	def removeCommand(self, to_delete):
 		''' Input: number of command to delete
-			Return: None
+			Return: string giving accounting of action taken
 			Deletes the specified command
 		'''		
 		if self.valid_cmd(to_delete):
 			to_delete = int(to_delete)
 
-		print("Deleting command {0}: {1}...".format(to_delete, self.cmd_dict[to_delete]))
-		
 		idx = 0
 		with open(self.file_loc, 'r') as f:
 			with open('tmp', 'w') as new_f:
@@ -133,13 +130,14 @@ class commandCache():
 					if idx != to_delete:
 						new_f.write(line)
 					idx += 1
-		os.replace('tmp', self.file_loc)			
+		os.replace('tmp', self.file_loc)
+
+		return "Command {0}: {1}, has been deleted.".format(to_delete, self.cmd_dict[to_delete])		
 				
 	def runCommand(self, to_run):
 		''' Input: number of command to run 
 			Return: stdout of command run as text
 		'''
-
 		if self.valid_cmd(to_run):
 			to_run = int(to_run)
 
@@ -150,7 +148,7 @@ class commandCache():
 		return out.stdout
 	
 	def __str__(self):
-		'''Return: formatted string representation of commands in CMD_FILE_LOC: Command#    Command
+		'''	Return: formatted string representation of commands in self.file_loc: Command#    Command
 		'''
 		cmd_list_str = "\n\nCommand#\tCommand\n-------------------------------\n"
 		
@@ -168,9 +166,9 @@ cmd_cache = create_cmd_obj(CMD_FILE_LOC, EMPTY_FILE_MSG)
 
 # Run appropriate method based on CLI positional arg and flags
 if args.append:
-	cmd_cache.appendCommand(args.command)
+	print(cmd_cache.appendCommand(args.command))
 elif args.remove:
-	cmd_cache.removeCommand(args.command)
+	print(cmd_cache.removeCommand(args.command))
 elif args.command is None:
 	print(cmd_cache)
 else:
